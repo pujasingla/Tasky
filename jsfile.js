@@ -1,5 +1,45 @@
 const taskContainer = document.querySelector(".task__container");
+const globalStore= [];
 console.log(taskContainer);
+
+const generateNewCard = (taskData) =>
+`
+  <div class="col-sm-12 col-md-6 col-lg-4" id=${taskData.id}>
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-primary"><i class="fas fa-pencil-alt"></i></button>
+        <button type="button" class="btn btn-outline-danger"><i class="fas fa-trash-alt"></i></button>
+      </div>
+      <div class="card-body">
+        <img src=${taskData.imageUrl} class="card-img-top"
+          alt="...">
+        <h5 class="card-title fw-bold text-primary">${taskData.taskTitle}</h5>
+        <p class="card-text">${taskData.taskDescription}</p>
+        <a href="#" class="btn btn-primary">${taskData.taskType}</a>
+      </div>
+    </div>
+  </div>
+  </div>
+  `
+;
+
+const loadInitialCardData = () => {
+  //local storage to get tasky cards taskData
+const getCardData = localStorage.getItem("tasky");
+
+  //convert to normal objects
+const {cards} = JSON.parse(getCardData);//parse is reverse of stringify //cards is object //destructing is used
+
+  //loop over thode array of task object to create html card, inject it to document
+cards.map((cardObject)=>{
+  taskContainer.insertAdjacentHTML("beforeend", generateNewCard(cardObject));
+
+  //update or globalStore
+  globalStore.push(cardObject);
+})
+
+};
+
 
 const saveChanges = () => {
   const taskData = {
@@ -10,24 +50,13 @@ const saveChanges = () => {
     taskDescription: document.getElementById("taskdescription").value
   };
 //  console.log(taskData);//debbugging purpose
-const newCard = `
-<div class="col-sm-12 col-md-6 col-lg-4" id=${taskData.id}>
-  <div class="card h-100">
-    <div class="card-header d-flex justify-content-end gap-2">
-      <button type="button" class="btn btn-outline-primary"><i class="fas fa-pencil-alt"></i></button>
-      <button type="button" class="btn btn-outline-danger"><i class="fas fa-trash-alt"></i></button>
-    </div>
-    <div class="card-body">
-      <img src=${taskData.imageUrl} class="card-img-top"
-        alt="...">
-      <h5 class="card-title fw-bold text-primary">${taskData.taskTitle}</h5>
-      <p class="card-text">${taskData.taskDescription}</p>
-      <a href="#" class="btn btn-primary">${taskData.taskType}</a>
-    </div>
-  </div>
-</div>
-</div>
-`;
 
-taskContainer.insertAdjacentHTML("beforeend",newCard);
+
+taskContainer.insertAdjacentHTML("beforeend",generateNewCard(taskData)); // adding cards adjacent to each other
+
+globalStore.push(taskData); // storing cards in local storage
+//localStorage.setItem("tasky",globalStore); //tasky is our id
+//pushed in form of object of object
+localStorage.setItem("tasky",JSON.stringify({cards:globalStore}));//object of object converted into array of objects using stringify
+
 };
